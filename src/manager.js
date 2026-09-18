@@ -47,6 +47,12 @@ export default class Manager {
     });
     return todoItem;
   }
+  getTodoItemsByProjectId(projectId) {
+    const matchingToDoItems = this.todoList.filter((todoItem) => {
+      return (todoItem.projectId === projectId);
+    });
+    return matchingToDoItems;
+  }
   getProjectById(projectId) {
     const project = this.projectList.find((element) => {
       return element.projectId === projectId;
