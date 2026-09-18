@@ -2,7 +2,8 @@ import TodoItem from "./todoItem.js";
 import Project from "./project.js";
 
 // Holds every todo item and project in the app, and is the single place
-// that adds, removes and looks them up.
+// that adds, removes and looks them up. The DOM code reads from it and
+// never keeps its own copy of the data.
 export default class Manager {
   constructor(todoList = [], projectList = []) {
     this.todoList = todoList;
@@ -49,7 +50,7 @@ export default class Manager {
   }
   getTodoItemsByProjectId(projectId) {
     const matchingToDoItems = this.todoList.filter((todoItem) => {
-      return (todoItem.projectId === projectId);
+      return todoItem.projectId === projectId;
     });
     return matchingToDoItems;
   }
