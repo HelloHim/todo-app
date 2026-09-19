@@ -38,5 +38,11 @@ export default function domController(manager) {
     renderPage();
   });
 
+  const newProject = document.getElementById("new-project");
+  newProject.addEventListener("click", () => {
+    manager.createProject("fitnessProjectId", "Fitness");
+    renderPage();
+  });
+
   renderPage();
 }
