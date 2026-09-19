@@ -1,5 +1,6 @@
 import Manager from "./manager.js";
 import domController from "./domController.js";
+import "./styles.css";
 
 const manager = new Manager();
 
