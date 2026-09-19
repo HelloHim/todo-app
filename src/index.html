@@ -6,10 +6,19 @@
     <title>Todo App</title>
   </head>
   <body>
-    <div class="menu-buttons">
-      <button id="new-task">New Task</button>
-      <button id="new-project">New Project</button>
+    <div id="container">
+      <div id="side-bar">
+        <div id="task-menu">
+          <button id="new-task">New Task</button>
+          <button id="inbox">Inbox</button>
+          <button id="today">Today</button>
+          <button id="upcoming">Upcoming</button>
+        </div>
+        <p>My Projects</p>
+        <button id="new-project">New Project</button>
+        <div id="project-list"></div>
+      </div>
+      <div id="task-list"></div>
     </div>
-    <div id="content"></div>
   </body>
 </html>
