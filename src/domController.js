@@ -7,12 +7,12 @@ export default function domController(manager) {
     const projectLi = document.createElement("li");
     projectLi.textContent = project.projectName;
 
-    // Nest a list item for each todo belonging to this project.
-    const projectTodoItems = manager.getTodoItemsByProjectId(project.projectId);
-    projectTodoItems.forEach((todoItem) => {
-      const todoLi = document.createElement("li");
-      todoLi.textContent = todoItem.title;
-      projectLi.appendChild(todoLi);
+    // Nest a list item for each task belonging to this project.
+    const projectTasks = manager.getTasksByProjectId(project.projectId);
+    projectTasks.forEach((task) => {
+      const taskLi = document.createElement("li");
+      taskLi.textContent = task.title;
+      projectLi.appendChild(taskLi);
     });
 
     content.appendChild(projectLi);

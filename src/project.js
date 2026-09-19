@@ -1,5 +1,4 @@
-// A named group of todo items. Todo items refer to a project by its
-// projectId.
+// A named group of tasks. Tasks refer to a project by its projectId.
 export default class Project {
   constructor(projectId, projectName) {
     this.projectId = projectId;

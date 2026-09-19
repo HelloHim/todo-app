@@ -1,8 +1,8 @@
 // A single to-do item. projectId links it to a Project held by the manager,
 // rather than storing the project itself.
-export default class TodoItem {
-  constructor(todoItemId, title, description, completionStatus, priority, dueDate, projectId) {
-    this.todoItemId = todoItemId;
+export default class Task {
+  constructor(taskId, title, description, completionStatus, priority, dueDate, projectId) {
+    this.taskId = taskId;
     this.title = title;
     this.description = description;
     this.completionStatus = completionStatus;
