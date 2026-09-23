@@ -1,16 +1,157 @@
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/Inter-VariableFont_opsz\,wght.woff2");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/Inter-Italic-VariableFont_opsz\,wght.woff2");
+  font-weight: 100 900;
+  font-style: italic;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-#container {
-  display: grid;
-  grid-template-columns: 1fr 3fr;
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  & > .preview-icon {
+    width: 14px;
+    height: 14px;
+  }
 }
 
-#task-menu {
+#container {
+  display: grid;
+  font-family: "Inter";
+  height: 100vh;
+  grid-template-columns: 260px 1fr;
+}
+
+#sidebar {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  background-color: #fbf9f7;
+  border-right: 1px solid #f1efee;
+  color: #34333b;
+  font-size: 13px;
+  padding: 12px;
+  width: 100%;
+}
+
+#sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#sidebar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background-color: #e65c43;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+#sidebar-title {
+  color: #1e1613;
+  font-size: 1.15em;
+  font-weight: 700;
+}
+
+#add-task {
+  color: #b75334;
+  font-weight: 600;
+  padding-left: 10px;
+
+  & > .preview-icon {
+    stroke-width: 3;
+  }
+}
+
+#view-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: start;
   gap: 2px;
+  width: 100%;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: start;
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #6f6b67;
+  font-weight: 400;
+}
+.nav-item:hover,
+.nav-item:focus-visible,
+.nav-item.active {
+  background-color: #f1efee;
+  color: #2d323b;
+  font-weight: 500;
+}
+
+#sidebar-projects {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+
+  margin-bottom: -8px;
+  & > h2 {
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #827e78;
+  }
+  & > button {
+    color: #726e6a;
+  }
+}
+
+#project-list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: start;
+  gap: 2px;
+  width: 100%;
+}
+
+#project-list > .nav-item {
+  text-transform: capitalize;
+}
+
+.project-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background-color: #77bd75;
+  flex-shrink: 0;
 }

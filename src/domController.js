@@ -22,7 +22,16 @@ export default function domController(manager) {
     // Render one list item per project.
     manager.projectList.forEach((project) => {
       const projectDiv = document.createElement("div");
-      projectDiv.textContent = project.projectName;
+      projectDiv.classList.add("nav-item");
+
+      const dot = document.createElement("span");
+      dot.classList.add("project-dot");
+      projectDiv.appendChild(dot);
+
+      const label = document.createElement("span");
+      label.textContent = project.projectName;
+      projectDiv.appendChild(label);
+
       projectList.appendChild(projectDiv);
     });
   };
@@ -44,7 +53,7 @@ export default function domController(manager) {
   // Create a task when the new task button is clicked, then re-render the page.
   // The task details are hard-coded placeholders for now. The fixed task ID
   // means every click creates a task with the same ID.
-  const newTask = document.getElementById("new-task");
+  const newTask = document.getElementById("add-task");
   newTask.addEventListener("click", () => {
     manager.createTask(
       "task6",
@@ -60,7 +69,7 @@ export default function domController(manager) {
 
   // Create a project when the new project button is clicked, then re-render
   // the page. The project details are hard-coded placeholders for now.
-  const newProject = document.getElementById("new-project");
+  const newProject = document.getElementById("add-project");
   newProject.addEventListener("click", () => {
     manager.createProject("fitnessProjectId", "Fitness");
     renderPage();
