@@ -155,3 +155,163 @@ button {
   background-color: #77bd75;
   flex-shrink: 0;
 }
+
+#main-panel {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  padding: 52px 32px 24px 68px;
+}
+
+#main-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+#breadcrumb {
+  color: #8d7d70;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+#page-title {
+  color: #22160a;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+#header-helper {
+  color: #7f7b77;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  margin-bottom: 1px;
+}
+
+#main-divider {
+  border-bottom: 1px solid #e8e8e8;
+  margin: 28px 0 13px;
+}
+
+.task-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    "checkbox title actions"
+    ". meta pill";
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 7px;
+  padding: 12px 0 10px 5px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.task-checkbox {
+  grid-area: checkbox;
+  /* Nudge down 1px so the circle's centre lines up with the text's visual centre. */
+  translate: 0 1px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #e65c43;
+  flex-shrink: 0;
+}
+
+.task-checkbox.completed {
+  background-color: #e65c43;
+}
+
+.task-main {
+  display: contents;
+}
+
+.task-title {
+  grid-area: title;
+  color: #27241e;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.task-meta {
+  grid-area: meta;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.task-due {
+  color: #756333;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.task-priority {
+  color: #825d38;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.project-pill {
+  grid-area: pill;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  background-color: #f1eef6;
+  border-radius: 12px;
+  padding: 4px 8px;
+  color: #4e426f;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.project-pill > .project-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.task-actions {
+  grid-area: actions;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  margin-right: 6px;
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+  border-radius: 6px;
+
+  & > .preview-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.icon-button:hover,
+.icon-button:focus-visible {
+  background-color: #f0f0f0;
+}
+
+.icon-button.edit-task {
+  color: #4a4643;
+}
+
+.icon-button.delete-task {
+  color: #474948;
+}
