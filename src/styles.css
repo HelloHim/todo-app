@@ -317,6 +317,162 @@ button {
 }
 
 #task-dialog {
+  width: 538px;
+  max-width: calc(100vw - 32px);
   margin: auto;
-  padding: 16px;
+  padding: 17px 27px 30px;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  background-color: #ffffff;
+  color: #34302c;
+  font-family: "Inter";
+}
+
+#task-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+#task-form {
+  display: flex;
+  flex-direction: column;
+}
+
+#task-dialog-title {
+  color: #22201e;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 9px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 18px;
+
+  & > label {
+    color: #3a3531;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  & > .form-field {
+    margin-bottom: 0;
+  }
+}
+
+#task-form input,
+#task-form textarea,
+#task-form select {
+  height: 34px;
+  border: 1px solid #e3e0dc;
+  border-radius: 8px;
+  padding: 0 12px;
+  background-color: #ffffff;
+  color: #34302c;
+  font: inherit;
+  font-size: 13px;
+}
+
+#task-form input::placeholder,
+#task-form textarea::placeholder {
+  color: #6b6561;
+}
+
+#task-form input:focus,
+#task-form textarea:focus,
+#task-form select:focus {
+  outline: none;
+  border-color: #bdb7b1;
+}
+
+#task-form textarea {
+  height: 84px;
+  padding: 6px 12px;
+  resize: vertical;
+}
+
+/* The design shows the date in the same grey as the selects beside it. */
+#task-form #task-due-input {
+  color: #6b6561;
+}
+
+/* Soften the browser's calendar icon to the lighter grey in the design. */
+#task-due-input::-webkit-calendar-picker-indicator {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+/* Replace the browser's select arrow with a chevron that matches the icons. */
+#task-form select {
+  appearance: none;
+  padding-right: 36px;
+  color: #6b6561;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a4643' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+/* The project select shows the chosen project's dot inside it, on the left. */
+.project-select {
+  position: relative;
+
+  & > .project-dot {
+    position: absolute;
+    top: 50%;
+    left: 13px;
+    translate: 0 -50%;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* The inbox is not a real project, so it gets a hollow grey dot. */
+  & > .project-dot.inbox {
+    background-color: transparent;
+    border: 1.5px solid #8f8a85;
+  }
+}
+
+/* Leaves room on the left for the project dot. The #task-form prefix is
+   needed to outweigh the shared input padding above. */
+#task-form .project-select > select {
+  width: 100%;
+  padding-left: 27px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 25px;
+
+  & > button {
+    justify-content: center;
+    height: 38px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+}
+
+#cancel-task {
+  padding: 0 20px;
+  border: 1px solid #e3e0dc;
+  background-color: #ffffff;
+  color: #3a3531;
+  font-weight: 500;
+}
+
+#submit-task {
+  padding: 0 29px;
+  background-color: #d24735;
+  color: #ffffff;
+  font-weight: 500;
 }

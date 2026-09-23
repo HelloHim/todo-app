@@ -42,6 +42,7 @@ export default function domController(manager) {
   const taskDialogTitle = document.getElementById("task-dialog-title");
   const submitTask = document.getElementById("submit-task");
   const projectSelect = document.getElementById("task-project-input");
+  const projectDot = document.getElementById("task-project-dot");
 
   // The id of the task the form is editing, or null when it is adding a new
   // task. The submit handler checks this to know which one to do.
@@ -172,6 +173,14 @@ export default function domController(manager) {
     });
   };
 
+  // Shows a hollow dot beside the project select when the inbox is chosen,
+  // and a filled one for a real project, as a native select cannot show
+  // icons inside itself.
+  const updateProjectDot = function () {
+    projectDot.classList.toggle("inbox", projectSelect.value === "defaultProjectId");
+  };
+  projectSelect.addEventListener("change", updateProjectDot);
+
   // Opens the task form as a modal. Given a task, the form is filled with its
   // details and saving updates it. Without one, the form starts empty and
   // saving creates a new task.
@@ -194,6 +203,7 @@ export default function domController(manager) {
       submitTask.textContent = "Add Task";
     }
 
+    updateProjectDot();
     taskDialog.showModal();
   };
 
