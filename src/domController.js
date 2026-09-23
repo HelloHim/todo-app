@@ -36,6 +36,10 @@ export default function domController(manager) {
   const projectList = document.getElementById("project-list");
   // The container that every task list item is appended to.
   const taskList = document.getElementById("task-list");
+  // The modal form used to add a task.
+  const taskDialog = document.getElementById("task-dialog");
+  const taskForm = document.getElementById("task-form");
+  const projectSelect = document.getElementById("task-project-input");
 
   // Re-renders everything that depends on the manager's data.
   const renderPage = function () {
@@ -109,10 +113,13 @@ export default function domController(manager) {
       const meta = document.createElement("div");
       meta.classList.add("task-meta");
 
-      const dueDate = document.createElement("span");
-      dueDate.classList.add("task-due");
-      dueDate.textContent = formatDueDate(task.dueDate);
-      meta.appendChild(dueDate);
+      // The due date is optional in the task form, so only show it if set.
+      if (task.dueDate) {
+        const dueDate = document.createElement("span");
+        dueDate.classList.add("task-due");
+        dueDate.textContent = formatDueDate(task.dueDate);
+        meta.appendChild(dueDate);
+      }
 
       const priority = document.createElement("span");
       priority.classList.add("task-priority");
@@ -143,20 +150,56 @@ export default function domController(manager) {
     });
   };
 
-  // Create a task when the new task button is clicked, then re-render the page.
-  // The task details are hard-coded placeholders for now. The fixed task ID
-  // means every click creates a task with the same ID.
+  // Fills the project dropdown with one option per project. It is rebuilt
+  // each time the form opens so newly created projects are included.
+  const renderProjectOptions = function () {
+    projectSelect.replaceChildren();
+    manager.projectList.forEach((project) => {
+      const option = document.createElement("option");
+      option.value = project.projectId;
+      // Tasks without a project live in the default project, which the
+      // design calls "Inbox".
+      option.textContent = project.projectId === "defaultProjectId" ? "Inbox" : project.projectName;
+      projectSelect.appendChild(option);
+    });
+  };
+
+  // Clears the task form and opens it as a modal.
+  const openTaskDialog = function () {
+    taskForm.reset();
+    renderProjectOptions();
+    taskDialog.showModal();
+  };
+
+  // Open the task form when the new task button is clicked.
   const newTask = document.getElementById("add-task");
-  newTask.addEventListener("click", () => {
+  newTask.addEventListener("click", () => openTaskDialog());
+
+  // Close the task form without saving when cancel is clicked. Pressing
+  // Escape also closes it, which the dialog element handles itself.
+  const cancelTask = document.getElementById("cancel-task");
+  cancelTask.addEventListener("click", () => taskDialog.close());
+
+  // Create a task from the form's values, then close the form and re-render.
+  // The browser only fires submit once the title passes the input's required
+  // and non-blank pattern checks.
+  taskForm.addEventListener("submit", (event) => {
+    // Stop the form from reloading the page, which would lose all the data.
+    event.preventDefault();
+    const formData = new FormData(taskForm);
+    // Generate a unique id for this task using the Crypto API, and limit it
+    // to 5 characters to keep it short.
+    const taskId = crypto.randomUUID().substring(0, 5);
     manager.createTask(
-      "task6",
-      "Call the dentist",
-      "Book a check-up appointment",
+      taskId,
+      formData.get("title").trim(),
+      formData.get("description").trim(),
       false,
-      "medium",
-      "2026-09-22",
-      "homeProjectId",
+      formData.get("priority"),
+      formData.get("dueDate"),
+      formData.get("projectId"),
     );
+    taskDialog.close();
     renderPage();
   });
 

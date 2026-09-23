@@ -148,5 +148,52 @@
         <div id="task-list"></div>
       </div>
     </div>
+    <dialog id="task-dialog">
+      <form id="task-form">
+        <h2 id="task-dialog-title">Add Task</h2>
+        <div class="form-field">
+          <label for="task-title-input">Title</label>
+          <input
+            id="task-title-input"
+            name="title"
+            type="text"
+            placeholder="What needs to be done?"
+            required
+            pattern=".*\S.*"
+            title="Enter a title"
+          />
+        </div>
+        <div class="form-field">
+          <label for="task-description-input">Description</label>
+          <textarea
+            id="task-description-input"
+            name="description"
+            placeholder="Add more details... (optional)"
+          ></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="task-due-input">Due Date</label>
+            <input id="task-due-input" name="dueDate" type="date" />
+          </div>
+          <div class="form-field">
+            <label for="task-priority-input">Priority</label>
+            <select id="task-priority-input" name="priority">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="task-project-input">Project</label>
+            <select id="task-project-input" name="projectId"></select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button id="cancel-task" type="button">Cancel</button>
+          <button id="submit-task" type="submit">Add Task</button>
+        </div>
+      </form>
+    </dialog>
   </body>
 </html>

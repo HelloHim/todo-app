@@ -315,3 +315,8 @@ button {
 .icon-button.delete-task {
   color: #474948;
 }
+
+#task-dialog {
+  margin: auto;
+  padding: 16px;
+}
