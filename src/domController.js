@@ -36,10 +36,16 @@ export default function domController(manager) {
   const projectList = document.getElementById("project-list");
   // The container that every task list item is appended to.
   const taskList = document.getElementById("task-list");
-  // The modal form used to add a task.
+  // The modal form, shared by adding and editing a task.
   const taskDialog = document.getElementById("task-dialog");
   const taskForm = document.getElementById("task-form");
+  const taskDialogTitle = document.getElementById("task-dialog-title");
+  const submitTask = document.getElementById("submit-task");
   const projectSelect = document.getElementById("task-project-input");
+
+  // The id of the task the form is editing, or null when it is adding a new
+  // task. The submit handler checks this to know which one to do.
+  let editingTaskId = null;
 
   // Re-renders everything that depends on the manager's data.
   const renderPage = function () {
@@ -139,7 +145,9 @@ export default function domController(manager) {
 
       const actions = document.createElement("div");
       actions.classList.add("task-actions");
-      actions.appendChild(createIconButton("edit-task", editIconPath));
+      const editButton = createIconButton("edit-task", editIconPath);
+      editButton.addEventListener("click", () => openTaskDialog(task));
+      actions.appendChild(editButton);
       actions.appendChild(createIconButton("delete-task", trashIconPath));
 
       row.appendChild(checkbox);
@@ -164,10 +172,28 @@ export default function domController(manager) {
     });
   };
 
-  // Clears the task form and opens it as a modal.
-  const openTaskDialog = function () {
+  // Opens the task form as a modal. Given a task, the form is filled with its
+  // details and saving updates it. Without one, the form starts empty and
+  // saving creates a new task.
+  const openTaskDialog = function (task) {
     taskForm.reset();
     renderProjectOptions();
+
+    if (task) {
+      editingTaskId = task.taskId;
+      taskDialogTitle.textContent = "Edit Task";
+      submitTask.textContent = "Save";
+      taskForm.elements.title.value = task.title;
+      taskForm.elements.description.value = task.description;
+      taskForm.elements.dueDate.value = task.dueDate;
+      taskForm.elements.priority.value = task.priority;
+      taskForm.elements.projectId.value = task.projectId;
+    } else {
+      editingTaskId = null;
+      taskDialogTitle.textContent = "Add Task";
+      submitTask.textContent = "Add Task";
+    }
+
     taskDialog.showModal();
   };
 
@@ -180,25 +206,34 @@ export default function domController(manager) {
   const cancelTask = document.getElementById("cancel-task");
   cancelTask.addEventListener("click", () => taskDialog.close());
 
-  // Create a task from the form's values, then close the form and re-render.
-  // The browser only fires submit once the title passes the input's required
-  // and non-blank pattern checks.
+  // Save the form's values to the task being edited, or create a new task
+  // from them, then close the form and re-render. The browser only fires
+  // submit once the title passes the input's required and non-blank pattern
+  // checks.
   taskForm.addEventListener("submit", (event) => {
     // Stop the form from reloading the page, which would lose all the data.
     event.preventDefault();
     const formData = new FormData(taskForm);
-    // Generate a unique id for this task using the Crypto API, and limit it
-    // to 5 characters to keep it short.
-    const taskId = crypto.randomUUID().substring(0, 5);
-    manager.createTask(
-      taskId,
-      formData.get("title").trim(),
-      formData.get("description").trim(),
-      false,
-      formData.get("priority"),
-      formData.get("dueDate"),
-      formData.get("projectId"),
-    );
+    const title = formData.get("title").trim();
+    const description = formData.get("description").trim();
+    const priority = formData.get("priority");
+    const dueDate = formData.get("dueDate");
+    const projectId = formData.get("projectId");
+
+    if (editingTaskId) {
+      const task = manager.getTaskById(editingTaskId);
+      task.editTitle(title);
+      task.editDescription(description);
+      task.editPriority(priority);
+      task.editDueDate(dueDate);
+      task.editProject(projectId);
+    } else {
+      // Generate a unique id for this task using the Crypto API, and limit it
+      // to 5 characters to keep it short.
+      const taskId = crypto.randomUUID().substring(0, 5);
+      manager.createTask(taskId, title, description, false, priority, dueDate, projectId);
+    }
+
     taskDialog.close();
     renderPage();
   });
