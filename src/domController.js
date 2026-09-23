@@ -67,8 +67,10 @@ export default function domController(manager) {
   };
 
   // Formats an ISO date string (e.g. "2026-09-22") as "Thu, Sep 22, 2026".
+  // A bare date string is parsed as UTC midnight, which shows as the day
+  // before in time zones behind UTC, so a local midnight time is added first.
   const formatDueDate = function (dueDate) {
-    return new Date(dueDate).toLocaleDateString("en-US", {
+    return new Date(`${dueDate}T00:00`).toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
       day: "2-digit",
