@@ -149,7 +149,13 @@ export default function domController(manager) {
       const editButton = createIconButton("edit-task", editIconPath);
       editButton.addEventListener("click", () => openTaskDialog(task));
       actions.appendChild(editButton);
-      actions.appendChild(createIconButton("delete-task", trashIconPath));
+      // Deletes the task straight away. There is no confirmation step or undo.
+      const deleteButton = createIconButton("delete-task", trashIconPath);
+      deleteButton.addEventListener("click", () => {
+        manager.removeTask(task.taskId);
+        renderPage();
+      });
+      actions.appendChild(deleteButton);
 
       row.appendChild(checkbox);
       row.appendChild(main);
