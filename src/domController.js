@@ -1,3 +1,5 @@
+import { parseISO, format } from "date-fns";
+
 // SVG path data for the task row action icons. The edit icon is a pencil
 // above an underline, drawn by hand to match the design. The delete icon is
 // lucide's "trash".
@@ -77,16 +79,11 @@ export default function domController(manager) {
     });
   };
 
-  // Formats an ISO date string (e.g. "2026-09-22") as "Thu, Sep 22, 2026".
-  // A bare date string is parsed as UTC midnight, which shows as the day
-  // before in time zones behind UTC, so a local midnight time is added first.
+  // Formats an ISO date string (e.g. "2026-09-22") as "Tue, Sep 22, 2026".
+  // parseISO reads a bare date as local midnight, so it shows on the right day.
   const formatDueDate = function (dueDate) {
-    return new Date(`${dueDate}T00:00`).toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    });
+    const formattedDueDate = format(parseISO(dueDate), "EEE, MMM dd, yyyy");
+    return formattedDueDate;
   };
 
   // Rebuilds the main panel's task rows from the manager's tasks.
