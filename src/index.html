@@ -198,5 +198,26 @@
         </div>
       </form>
     </dialog>
+    <dialog id="project-dialog">
+      <form id="project-form">
+        <h2 id="project-dialog-title">Add Project</h2>
+        <div class="form-field">
+          <label for="project-name-input">Name</label>
+          <input
+            id="project-name-input"
+            name="projectName"
+            type="text"
+            placeholder="e.g. Fitness"
+            required
+            pattern=".*\S.*"
+            title="Enter a name"
+          />
+        </div>
+        <div class="form-actions">
+          <button id="cancel-project" type="button">Cancel</button>
+          <button id="submit-project" type="submit">Add Project</button>
+        </div>
+      </form>
+    </dialog>
   </body>
 </html>

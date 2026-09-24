@@ -251,18 +251,34 @@ export default function domController(manager) {
     renderPage();
   });
 
-  // Ask for a project name when the new project button is clicked, then
-  // create the project and re-render the page.
+  // The modal form for adding a project.
+  const projectDialog = document.getElementById("project-dialog");
+  const projectForm = document.getElementById("project-form");
+
+  // Open an empty project form when the new project button is clicked.
   const newProject = document.getElementById("add-project");
   newProject.addEventListener("click", () => {
-    const projectName = prompt("Project name:");
+    projectForm.reset();
+    projectDialog.showModal();
+  });
 
-    // Do nothing if the user clicked cancel or left the name blank.
-    if (projectName === null || projectName.trim() === "") return;
+  // Close the project form without saving when cancel is clicked.
+  const cancelProject = document.getElementById("cancel-project");
+  cancelProject.addEventListener("click", () => projectDialog.close());
+
+  // Create a project from the form's name, then close the form and
+  // re-render. Like the task title, the browser only fires submit once the
+  // name is not blank.
+  projectForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(projectForm);
+    const projectName = formData.get("projectName").trim();
 
     // Generate a unique id the same way as for tasks.
     const projectId = crypto.randomUUID().substring(0, 5);
-    manager.createProject(projectId, projectName.trim());
+    manager.createProject(projectId, projectName);
+
+    projectDialog.close();
     renderPage();
   });
 

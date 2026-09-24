@@ -316,7 +316,8 @@ button {
   color: #474948;
 }
 
-#task-dialog {
+#task-dialog,
+#project-dialog {
   width: 538px;
   max-width: calc(100vw - 32px);
   margin: auto;
@@ -329,16 +330,24 @@ button {
   font-family: "Inter";
 }
 
-#task-dialog::backdrop {
+/* The project form only has one field, so its dialog is narrower. */
+#project-dialog {
+  width: 400px;
+}
+
+#task-dialog::backdrop,
+#project-dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.3);
 }
 
-#task-form {
+#task-form,
+#project-form {
   display: flex;
   flex-direction: column;
 }
 
-#task-dialog-title {
+#task-dialog-title,
+#project-dialog-title {
   color: #22201e;
   font-size: 20px;
   font-weight: 500;
@@ -370,7 +379,8 @@ button {
 
 #task-form input,
 #task-form textarea,
-#task-form select {
+#task-form select,
+#project-form input {
   height: 34px;
   border: 1px solid #e3e0dc;
   border-radius: 8px;
@@ -382,13 +392,15 @@ button {
 }
 
 #task-form input::placeholder,
-#task-form textarea::placeholder {
+#task-form textarea::placeholder,
+#project-form input::placeholder {
   color: #6b6561;
 }
 
 #task-form input:focus,
 #task-form textarea:focus,
-#task-form select:focus {
+#task-form select:focus,
+#project-form input:focus {
   outline: none;
   border-color: #bdb7b1;
 }
@@ -462,7 +474,8 @@ button {
   }
 }
 
-#cancel-task {
+#cancel-task,
+#cancel-project {
   padding: 0 20px;
   border: 1px solid #e3e0dc;
   background-color: #ffffff;
@@ -470,7 +483,8 @@ button {
   font-weight: 500;
 }
 
-#submit-task {
+#submit-task,
+#submit-project {
   padding: 0 29px;
   background-color: #d24735;
   color: #ffffff;
