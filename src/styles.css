@@ -148,6 +148,36 @@ button {
   text-transform: capitalize;
 }
 
+/* Pushes the edit button over to the right-hand side of the row. */
+.project-name {
+  flex-grow: 1;
+}
+
+/* A smaller version of the task row's edit button, so it fits in the row. */
+.icon-button.edit-project {
+  width: 20px;
+  height: 20px;
+  margin: -2px 0;
+  border-radius: 4px;
+  color: #726e6a;
+  /* Hidden until the row is hovered, so the list stays tidy. */
+  visibility: hidden;
+
+  & > .preview-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.nav-item:hover > .edit-project,
+.edit-project:focus-visible {
+  visibility: visible;
+}
+
+.icon-button.edit-project:hover {
+  background-color: #e6e3e1;
+}
+
 .project-dot {
   width: 8px;
   height: 8px;

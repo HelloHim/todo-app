@@ -10,4 +10,7 @@ export default class Project {
   editProjectName(newProjectName) {
     this.projectName = newProjectName;
   }
+  editColour(newColour) {
+    this.colour = newColour;
+  }
 }

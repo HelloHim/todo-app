@@ -73,8 +73,13 @@ export default function domController(manager) {
       projectDiv.appendChild(dot);
 
       const label = document.createElement("span");
+      label.classList.add("project-name");
       label.textContent = project.projectName;
       projectDiv.appendChild(label);
+
+      const editButton = createIconButton("edit-project", editIconPath);
+      editButton.addEventListener("click", () => openProjectDialog(project));
+      projectDiv.appendChild(editButton);
 
       projectList.appendChild(projectDiv);
     });
@@ -267,33 +272,63 @@ export default function domController(manager) {
     renderPage();
   });
 
-  // The modal form for adding a project.
+  // The modal form, shared by adding and editing a project.
   const projectDialog = document.getElementById("project-dialog");
   const projectForm = document.getElementById("project-form");
+  const projectDialogTitle = document.getElementById("project-dialog-title");
+  const submitProject = document.getElementById("submit-project");
 
-  // Open an empty project form when the new project button is clicked.
-  const newProject = document.getElementById("add-project");
-  newProject.addEventListener("click", () => {
+  // The id of the project the form is editing, or null when it is adding a
+  // new project. Works the same way as editingTaskId.
+  let editingProjectId = null;
+
+  // Opens the project form as a modal. Given a project, the form is filled
+  // with its details and saving updates it. Without one, the form starts
+  // empty and saving creates a new project.
+  const openProjectDialog = function (project) {
     projectForm.reset();
+
+    if (project) {
+      editingProjectId = project.projectId;
+      projectDialogTitle.textContent = "Edit Project";
+      submitProject.textContent = "Save";
+      projectForm.elements.projectName.value = project.projectName;
+      projectForm.elements.colour.value = project.colour;
+    } else {
+      editingProjectId = null;
+      projectDialogTitle.textContent = "Add Project";
+      submitProject.textContent = "Add Project";
+    }
+
     projectDialog.showModal();
-  });
+  };
+
+  // Open the project form when the new project button is clicked.
+  const newProject = document.getElementById("add-project");
+  newProject.addEventListener("click", () => openProjectDialog());
 
   // Close the project form without saving when cancel is clicked.
   const cancelProject = document.getElementById("cancel-project");
   cancelProject.addEventListener("click", () => projectDialog.close());
 
-  // Create a project from the form's name and colour, then close the form
-  // and re-render. Like the task title, the browser only fires submit once
-  // the name is not blank.
+  // Save the form's name and colour to the project being edited, or create a
+  // new project from them, then close the form and re-render. Like the task
+  // title, the browser only fires submit once the name is not blank.
   projectForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(projectForm);
     const projectName = formData.get("projectName").trim();
     const colour = formData.get("colour");
 
-    // Generate a unique id the same way as for tasks.
-    const projectId = crypto.randomUUID().substring(0, 5);
-    manager.createProject(projectId, projectName, colour);
+    if (editingProjectId) {
+      const project = manager.getProjectById(editingProjectId);
+      project.editProjectName(projectName);
+      project.editColour(colour);
+    } else {
+      // Generate a unique id the same way as for tasks.
+      const projectId = crypto.randomUUID().substring(0, 5);
+      manager.createProject(projectId, projectName, colour);
+    }
 
     projectDialog.close();
     renderPage();
