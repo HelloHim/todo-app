@@ -251,11 +251,18 @@ export default function domController(manager) {
     renderPage();
   });
 
-  // Create a project when the new project button is clicked, then re-render
-  // the page. The project details are hard-coded placeholders for now.
+  // Ask for a project name when the new project button is clicked, then
+  // create the project and re-render the page.
   const newProject = document.getElementById("add-project");
   newProject.addEventListener("click", () => {
-    manager.createProject("fitnessProjectId", "Fitness");
+    const projectName = prompt("Project name:");
+
+    // Do nothing if the user clicked cancel or left the name blank.
+    if (projectName === null || projectName.trim() === "") return;
+
+    // Generate a unique id the same way as for tasks.
+    const projectId = crypto.randomUUID().substring(0, 5);
+    manager.createProject(projectId, projectName.trim());
     renderPage();
   });
 
