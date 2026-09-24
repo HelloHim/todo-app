@@ -5,8 +5,8 @@ import "./styles.css";
 const manager = new Manager();
 
 // Dummy data for testing the manager during development.
-manager.createProject("workProjectId", "Work");
-manager.createProject("homeProjectId", "Home");
+manager.createProject("workProjectId", "Work", "#3f72af");
+manager.createProject("homeProjectId", "Home", "#4e8a4c");
 manager.createTask(
   "task1",
   "Finish report",

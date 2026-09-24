@@ -152,7 +152,6 @@ button {
   width: 8px;
   height: 8px;
   border-radius: 2px;
-  background-color: #77bd75;
   flex-shrink: 0;
 }
 
@@ -263,10 +262,8 @@ button {
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
-  background-color: #f1eef6;
   border-radius: 12px;
   padding: 4px 8px;
-  color: #4e426f;
   font-size: 12px;
   font-weight: 600;
   text-transform: capitalize;
@@ -460,6 +457,24 @@ button {
   padding-left: 27px;
 }
 
+/* A small swatch rather than a full-width bar. */
+#project-form #project-colour-input {
+  width: 64px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+/* Remove the browser's extra padding and border around the colour, so the
+   swatch fills the box with rounded corners. */
+#project-colour-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+#project-colour-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -472,6 +487,11 @@ button {
     border-radius: 8px;
     font-size: 14px;
   }
+}
+
+/* The colour swatch is short, so the gap above the buttons looked too big. */
+#project-form .form-actions {
+  margin-top: 16px;
 }
 
 #cancel-task,

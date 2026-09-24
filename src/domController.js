@@ -69,6 +69,7 @@ export default function domController(manager) {
 
       const dot = document.createElement("span");
       dot.classList.add("project-dot");
+      dot.style.backgroundColor = project.colour;
       projectDiv.appendChild(dot);
 
       const label = document.createElement("span");
@@ -134,8 +135,14 @@ export default function domController(manager) {
 
       const pill = document.createElement("span");
       pill.classList.add("project-pill");
+      // The text uses the project's colour. Adding "14" to the end of a hex
+      // colour makes it about 8% see-through, so on the white page the
+      // background shows as a very light version of the same colour.
+      pill.style.color = project.colour;
+      pill.style.backgroundColor = project.colour + "14";
       const pillDot = document.createElement("span");
       pillDot.classList.add("project-dot");
+      pillDot.style.backgroundColor = project.colour;
       pill.appendChild(pillDot);
       const pillLabel = document.createElement("span");
       pillLabel.textContent = project.projectName;
@@ -177,10 +184,19 @@ export default function domController(manager) {
   };
 
   // Shows a hollow dot beside the project select when the inbox is chosen,
-  // and a filled one for a real project, as a native select cannot show
-  // icons inside itself.
+  // and one filled with the project's colour for a real project, as a native
+  // select cannot show icons inside itself.
   const updateProjectDot = function () {
-    projectDot.classList.toggle("inbox", projectSelect.value === "defaultProjectId");
+    const isInbox = projectSelect.value === "defaultProjectId";
+    projectDot.classList.toggle("inbox", isInbox);
+
+    if (isInbox) {
+      // Clear the colour so the hollow inbox style from the CSS shows.
+      projectDot.style.backgroundColor = "";
+    } else {
+      const project = manager.getProjectById(projectSelect.value);
+      projectDot.style.backgroundColor = project.colour;
+    }
   };
   projectSelect.addEventListener("change", updateProjectDot);
 
@@ -266,17 +282,18 @@ export default function domController(manager) {
   const cancelProject = document.getElementById("cancel-project");
   cancelProject.addEventListener("click", () => projectDialog.close());
 
-  // Create a project from the form's name, then close the form and
-  // re-render. Like the task title, the browser only fires submit once the
-  // name is not blank.
+  // Create a project from the form's name and colour, then close the form
+  // and re-render. Like the task title, the browser only fires submit once
+  // the name is not blank.
   projectForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(projectForm);
     const projectName = formData.get("projectName").trim();
+    const colour = formData.get("colour");
 
     // Generate a unique id the same way as for tasks.
     const projectId = crypto.randomUUID().substring(0, 5);
-    manager.createProject(projectId, projectName);
+    manager.createProject(projectId, projectName, colour);
 
     projectDialog.close();
     renderPage();

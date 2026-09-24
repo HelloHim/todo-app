@@ -13,7 +13,7 @@ export default class Manager {
   createInitialDefaultProject() {
     // The default project every task starts in, and falls back to if
     // its project is removed.
-    const defaultProject = new Project("defaultProjectId", "default");
+    const defaultProject = new Project("defaultProjectId", "default", "#8f8a85");
     this.projectList.push(defaultProject);
   }
   createTask(taskId, title, description, completionStatus, priority, duedate, projectId) {
@@ -25,8 +25,8 @@ export default class Manager {
     const index = this.taskList.findIndex((element) => element.taskId === taskId);
     if (index !== -1) this.taskList = this.taskList.toSpliced(index, 1);
   }
-  createProject(projectId, projectName) {
-    const project = new Project(projectId, projectName);
+  createProject(projectId, projectName, colour) {
+    const project = new Project(projectId, projectName, colour);
     this.projectList.push(project);
   }
   // Removes a project and moves its tasks to the default project, so no task
