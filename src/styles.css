@@ -146,6 +146,14 @@ button {
 
 #project-list > .nav-item {
   text-transform: capitalize;
+  cursor: pointer;
+}
+
+/* A picked project. Its background colour is set in domController.js, as
+   it depends on the project's colour. */
+#project-list > .nav-item.selected {
+  color: #2d323b;
+  font-weight: 600;
 }
 
 /* Pushes the edit button over to the right-hand side of the row. */
@@ -303,6 +311,32 @@ button {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+}
+
+/* The picked projects, shown side by side under the page title. */
+#filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* Hide the row when no projects are picked, so it leaves no gap. */
+#filter-pills:empty {
+  display: none;
+}
+
+/* Bigger versions of the task row pills. */
+#filter-pills > .project-pill {
+  gap: 8px;
+  border-radius: 16px;
+  padding: 6px 14px;
+  font-size: 14px;
+
+  & > .project-dot {
+    width: 10px;
+    height: 10px;
+  }
 }
 
 .task-actions {

@@ -30,6 +30,26 @@ const createIconButton = function (className, pathData) {
   return button;
 };
 
+// Builds a rounded label showing a project's dot and name in its colour.
+// Used on each task row, and in bigger form above the task list.
+const createProjectPill = function (project) {
+  const pill = document.createElement("span");
+  pill.classList.add("project-pill");
+  // The text uses the project's colour. Adding "14" to the end of a hex
+  // colour makes it about 8% see-through, so on the white page the
+  // background shows as a very light version of the same colour.
+  pill.style.color = project.colour;
+  pill.style.backgroundColor = project.colour + "14";
+  const pillDot = document.createElement("span");
+  pillDot.classList.add("project-dot");
+  pillDot.style.backgroundColor = project.colour;
+  pill.appendChild(pillDot);
+  const pillLabel = document.createElement("span");
+  pillLabel.textContent = project.projectName;
+  pill.appendChild(pillLabel);
+  return pill;
+};
+
 // Wires the manager's data to the page: renders the project and task lists
 // and handles the buttons that create new tasks and projects. Every change
 // to the data is followed by a full re-render rather than patching the DOM.
@@ -45,15 +65,36 @@ export default function domController(manager) {
   const submitTask = document.getElementById("submit-task");
   const projectSelect = document.getElementById("task-project-input");
   const projectDot = document.getElementById("task-project-dot");
+  // The row above the task list showing which projects are picked.
+  const filterPills = document.getElementById("filter-pills");
 
   // The id of the task the form is editing, or null when it is adding a new
   // task. The submit handler checks this to know which one to do.
   let editingTaskId = null;
 
+  // The ids of the projects picked in the sidebar. Only their tasks are
+  // shown, or every task when the list is empty.
+  let selectedProjectIds = [];
+
+  // The inbox button shows every task, so it is only highlighted when no
+  // projects are picked.
+  const inboxButton = document.getElementById("view-inbox");
+
   // Re-renders everything that depends on the manager's data.
   const renderPage = function () {
     renderProjectView();
+    renderFilterView();
     renderTaskView();
+  };
+
+  // Rebuilds the row of picked project pills above the task list. When no
+  // projects are picked the row is left empty, and the CSS hides it.
+  const renderFilterView = function () {
+    filterPills.replaceChildren();
+    selectedProjectIds.forEach((projectId) => {
+      const project = manager.getProjectById(projectId);
+      filterPills.appendChild(createProjectPill(project));
+    });
   };
 
   // Rebuilds the sidebar's project list from the manager's projects.
@@ -62,10 +103,29 @@ export default function domController(manager) {
     // re-rendered from scratch.
     projectList.replaceChildren();
 
+    inboxButton.classList.toggle("active", selectedProjectIds.length === 0);
+
     // Render one list item per project.
     manager.projectList.forEach((project) => {
       const projectDiv = document.createElement("div");
       projectDiv.classList.add("nav-item");
+
+      // Give a picked project a light background in its own colour. Adding
+      // "26" to the end of a hex colour makes it about 15% see-through.
+      if (selectedProjectIds.includes(project.projectId)) {
+        projectDiv.classList.add("selected");
+        projectDiv.style.backgroundColor = project.colour + "26";
+      }
+
+      // Clicking a project picks it, or un-picks it if it was already picked.
+      projectDiv.addEventListener("click", () => {
+        if (selectedProjectIds.includes(project.projectId)) {
+          selectedProjectIds = selectedProjectIds.filter((id) => id !== project.projectId);
+        } else {
+          selectedProjectIds.push(project.projectId);
+        }
+        renderPage();
+      });
 
       const dot = document.createElement("span");
       dot.classList.add("project-dot");
@@ -78,7 +138,12 @@ export default function domController(manager) {
       projectDiv.appendChild(label);
 
       const editButton = createIconButton("edit-project", editIconPath);
-      editButton.addEventListener("click", () => openProjectDialog(project));
+      editButton.addEventListener("click", (event) => {
+        // Stop the click reaching the row, so editing does not also pick
+        // or un-pick the project.
+        event.stopPropagation();
+        openProjectDialog(project);
+      });
       projectDiv.appendChild(editButton);
 
       projectList.appendChild(projectDiv);
@@ -100,6 +165,10 @@ export default function domController(manager) {
 
     // Render one row per task.
     manager.taskList.forEach((task) => {
+      // Skip tasks that are not in a picked project. When no projects are
+      // picked, every task is shown.
+      if (selectedProjectIds.length > 0 && !selectedProjectIds.includes(task.projectId)) return;
+
       const project = manager.getProjectById(task.projectId);
 
       const row = document.createElement("div");
@@ -138,20 +207,7 @@ export default function domController(manager) {
 
       main.appendChild(meta);
 
-      const pill = document.createElement("span");
-      pill.classList.add("project-pill");
-      // The text uses the project's colour. Adding "14" to the end of a hex
-      // colour makes it about 8% see-through, so on the white page the
-      // background shows as a very light version of the same colour.
-      pill.style.color = project.colour;
-      pill.style.backgroundColor = project.colour + "14";
-      const pillDot = document.createElement("span");
-      pillDot.classList.add("project-dot");
-      pillDot.style.backgroundColor = project.colour;
-      pill.appendChild(pillDot);
-      const pillLabel = document.createElement("span");
-      pillLabel.textContent = project.projectName;
-      pill.appendChild(pillLabel);
+      const pill = createProjectPill(project);
 
       const actions = document.createElement("div");
       actions.classList.add("task-actions");
@@ -230,6 +286,12 @@ export default function domController(manager) {
     updateProjectDot();
     taskDialog.showModal();
   };
+
+  // Un-pick every project when the inbox is clicked, so all tasks show again.
+  inboxButton.addEventListener("click", () => {
+    selectedProjectIds = [];
+    renderPage();
+  });
 
   // Open the task form when the new task button is clicked.
   const newTask = document.getElementById("add-task");
