@@ -137,8 +137,12 @@ export default function domController(manager) {
     todayButton.classList.toggle("active", currentView === "today");
     upcomingButton.classList.toggle("active", currentView === "upcoming");
 
-    // Render one list item per project.
+    // Render one list item per project. The default project is not a real
+    // project the user made, only a fallback for tasks with none picked, so
+    // it never shows up here.
     manager.projectList.forEach((project) => {
+      if (project.projectId === "defaultProjectId") return;
+
       const projectDiv = document.createElement("div");
       projectDiv.classList.add("nav-item");
 
@@ -210,8 +214,6 @@ export default function domController(manager) {
       if (currentView === "today" && task.dueDate !== today) return;
       if (currentView === "upcoming" && task.dueDate <= today) return;
 
-      const project = manager.getProjectById(task.projectId);
-
       const row = document.createElement("div");
       row.classList.add("task-row");
 
@@ -253,8 +255,6 @@ export default function domController(manager) {
 
       main.appendChild(meta);
 
-      const pill = createProjectPill(project);
-
       const actions = document.createElement("div");
       actions.classList.add("task-actions");
       const editButton = createIconButton("edit-task", editIconPath);
@@ -270,7 +270,12 @@ export default function domController(manager) {
 
       row.appendChild(checkbox);
       row.appendChild(main);
-      row.appendChild(pill);
+      // A task with no real project shows no pill at all, as the default
+      // project is only a fallback and should never appear in the UI.
+      if (task.projectId !== "defaultProjectId") {
+        const project = manager.getProjectById(task.projectId);
+        row.appendChild(createProjectPill(project));
+      }
       row.appendChild(actions);
       taskList.appendChild(row);
     });
@@ -283,6 +288,14 @@ export default function domController(manager) {
   // fallback for tasks with no project chosen.
   const renderProjectOptions = function () {
     projectDropdown.replaceChildren();
+
+    // Lets the user pick no project at all, same as leaving the field
+    // untouched. Has no dot, as it is not standing in for a real project.
+    const noneRow = document.createElement("div");
+    noneRow.classList.add("project-dropdown-item");
+    noneRow.textContent = "(none)";
+    noneRow.addEventListener("click", () => selectProject("defaultProjectId"));
+    projectDropdown.appendChild(noneRow);
 
     manager.projectList.forEach((project) => {
       if (project.projectId === "defaultProjectId") return;
@@ -313,25 +326,19 @@ export default function domController(manager) {
     projectDropdown.appendChild(newProjectRow);
   };
 
-  // Shows "Select Project" with no dot when nothing is chosen yet. A task
-  // can still end up with no project chosen, as Manager.createTask falls
-  // back to the default project when it gets an empty projectId. An older
-  // task already filed under the default project shows a hollow dot and
-  // "Inbox", even though it cannot be picked again from the dropdown.
+  // Shows "Select Project" with no dot when nothing is chosen yet, and
+  // "(none)" with no dot when the default project is chosen, either by
+  // picking that row or because the task already had no real project. Both
+  // end up saving the task to the default project, which never shows up in
+  // the UI under its own name.
   const updateProjectDisplay = function () {
-    projectButton.classList.toggle("unselected", !projectInput.value);
+    const hasRealProject = projectInput.value && projectInput.value !== "defaultProjectId";
+    projectButton.classList.toggle("unselected", !hasRealProject);
+
     if (!projectInput.value) {
       projectLabel.textContent = "Select Project";
-      return;
-    }
-
-    const isInbox = projectInput.value === "defaultProjectId";
-    projectDot.classList.toggle("inbox", isInbox);
-
-    if (isInbox) {
-      // Clear the colour so the hollow inbox style from the CSS shows.
-      projectDot.style.backgroundColor = "";
-      projectLabel.textContent = "Inbox";
+    } else if (projectInput.value === "defaultProjectId") {
+      projectLabel.textContent = "(none)";
     } else {
       const project = manager.getProjectById(projectInput.value);
       projectDot.style.backgroundColor = project.colour;
@@ -453,6 +460,9 @@ export default function domController(manager) {
   const projectForm = document.getElementById("project-form");
   const projectDialogTitle = document.getElementById("project-dialog-title");
   const submitProject = document.getElementById("submit-project");
+  const deleteProject = document.getElementById("delete-project");
+  // Hidden until a project is actually being edited, set in openProjectDialog.
+  deleteProject.style.display = "none";
 
   // The id of the project the form is editing, or null when it is adding a
   // new project. Works the same way as editingTaskId.
@@ -470,10 +480,13 @@ export default function domController(manager) {
       submitProject.textContent = "Save";
       projectForm.elements.projectName.value = project.projectName;
       projectForm.elements.colour.value = project.colour;
+      // Only an existing project can be deleted, not one still being added.
+      deleteProject.style.display = "";
     } else {
       editingProjectId = null;
       projectDialogTitle.textContent = "Add Project";
       submitProject.textContent = "Add Project";
+      deleteProject.style.display = "none";
     }
 
     projectDialog.showModal();
@@ -482,6 +495,15 @@ export default function domController(manager) {
   // Open the project form when the new project button is clicked.
   const newProject = document.getElementById("add-project");
   newProject.addEventListener("click", () => openProjectDialog());
+
+  // Deletes the project being edited. Manager.removeProject already moves
+  // its tasks to the default project, so none of them are left pointing at
+  // a project that no longer exists.
+  deleteProject.addEventListener("click", () => {
+    manager.removeProject(editingProjectId);
+    projectDialog.close();
+    renderPage();
+  });
 
   // Close the project form without saving when cancel is clicked.
   const cancelProject = document.getElementById("cancel-project");

@@ -509,12 +509,6 @@ button {
     border-radius: 50%;
     pointer-events: none;
   }
-
-  /* The inbox is not a real project, so it gets a hollow grey dot. */
-  & > .project-dot.inbox {
-    background-color: transparent;
-    border: 1.5px solid #8f8a85;
-  }
 }
 
 /* Leaves room on the left for the project dot. The #task-form prefix is
@@ -575,11 +569,6 @@ button {
   & > .project-dot {
     border-radius: 50%;
   }
-
-  & > .project-dot.inbox {
-    background-color: transparent;
-    border: 1.5px solid #8f8a85;
-  }
 }
 
 .project-dropdown-item:hover {
@@ -635,12 +624,20 @@ button {
 }
 
 #cancel-task,
-#cancel-project {
+#cancel-project,
+#delete-project {
   padding: 0 20px;
   border: 1px solid #e3e0dc;
   background-color: #ffffff;
   color: #3a3531;
   font-weight: 500;
+}
+
+/* Pushes the delete button to the left, away from Cancel and Save. Shown
+   only when editing an existing project, toggled in domController.js. */
+#delete-project {
+  margin-right: auto;
+  color: #d24735;
 }
 
 #submit-task,
