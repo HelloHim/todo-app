@@ -1,14 +1,22 @@
 import Task from "./task.js";
 import Project from "./project.js";
+import { saveToLocalStorage, loadFromLocalStorage } from "./storage.js";
 
 // Holds every task and project in the app, and is the single place that
 // adds, removes and looks them up. The DOM code reads from it and never
 // keeps its own copy of the data.
 export default class Manager {
-  constructor(taskList = [], projectList = []) {
-    this.taskList = taskList;
-    this.projectList = projectList;
-    this.createInitialDefaultProject();
+  constructor() {
+    const loadedTodoData = loadFromLocalStorage();
+    
+    if (loadedTodoData) {
+      this.taskList = loadedTodoData.taskList;
+      this.projectList = loadedTodoData.projectList;
+    } else {
+      this.taskList = [];
+      this.projectList = [];
+      this.createInitialDefaultProject();
+    }
   }
   createInitialDefaultProject() {
     // The default, invisible project every task starts in, and falls back
@@ -20,14 +28,17 @@ export default class Manager {
     if (!projectId) projectId = "defaultProjectId";
     const task = new Task(taskId, title, description, completionStatus, priority, duedate, projectId);
     this.taskList.push(task);
+    saveToLocalStorage(this.taskList, this.projectList);
   }
   removeTask(taskId) {
     const index = this.taskList.findIndex((element) => element.taskId === taskId);
     if (index !== -1) this.taskList = this.taskList.toSpliced(index, 1);
+    saveToLocalStorage(this.taskList, this.projectList);
   }
   createProject(projectId, projectName, colour) {
     const project = new Project(projectId, projectName, colour);
     this.projectList.push(project);
+    saveToLocalStorage(this.taskList, this.projectList);
   }
   // Saves the form's new details to an existing task. Does not touch
   // completionStatus, which is handled separately by editTaskCompletion.
@@ -38,15 +49,18 @@ export default class Manager {
     task.editPriority(priority);
     task.editDueDate(duedate);
     task.editProject(projectId);
+    saveToLocalStorage(this.taskList, this.projectList);
   }
   editTaskCompletion(taskId, completionStatus) {
     const task = this.getTaskById(taskId);
     task.editCompletionStatus(completionStatus);
+    saveToLocalStorage(this.taskList, this.projectList);
   }
   editProject(projectId, projectName, colour) {
     const project = this.getProjectById(projectId);
     project.editProjectName(projectName);
     project.editColour(colour);
+    saveToLocalStorage(this.taskList, this.projectList);
   }
   // Removes a project and moves its tasks to the default, invisible project,
   // so no task is left pointing at a project that no longer exists.
@@ -60,6 +74,7 @@ export default class Manager {
       if (element.projectId === projectId) element.projectId = "defaultProjectId";
       return element;
     });
+    saveToLocalStorage(this.taskList, this.projectList);
   }
   getTaskById(taskId) {
     const task = this.taskList.find((element) => {
