@@ -70,6 +70,10 @@ export default function domController(manager) {
   const projectDot = document.getElementById("task-project-dot");
   // The row above the task list showing which projects are picked.
   const filterPills = document.getElementById("filter-pills");
+  // The heading and helper line above the task list, which change with
+  // whichever of the three views is picked.
+  const pageTitle = document.getElementById("page-title");
+  const headerHelper = document.getElementById("header-helper");
 
   // The id of the task the form is editing, or null when it is adding a new
   // task. The submit handler checks this to know which one to do.
@@ -79,15 +83,36 @@ export default function domController(manager) {
   // shown, or every task when the list is empty.
   let selectedProjectIds = [];
 
-  // The inbox button shows every task, so it is only highlighted when no
-  // projects are picked.
+  // Which of the three view menu buttons is picked: "inbox" shows every
+  // task, "today" only those due today, and "upcoming" only those due after
+  // today. The project filter above still applies on top of this.
+  let currentView = "inbox";
+
   const inboxButton = document.getElementById("view-inbox");
+  const todayButton = document.getElementById("view-today");
+  const upcomingButton = document.getElementById("view-upcoming");
 
   // Re-renders everything that depends on the manager's data.
   const renderPage = function () {
+    renderHeaderText();
     renderProjectView();
     renderFilterView();
     renderTaskView();
+  };
+
+  // Updates the heading and helper line above the task list to match
+  // whichever of the three views is picked.
+  const renderHeaderText = function () {
+    if (currentView === "today") {
+      pageTitle.textContent = "Inbox - Today";
+      headerHelper.textContent = "Everything due today";
+    } else if (currentView === "upcoming") {
+      pageTitle.textContent = "Inbox - Upcoming";
+      headerHelper.textContent = "What's coming up next";
+    } else {
+      pageTitle.textContent = "Inbox";
+      headerHelper.textContent = "Your tasks, all in one place";
+    }
   };
 
   // Rebuilds the row of picked project pills above the task list. When no
@@ -106,7 +131,11 @@ export default function domController(manager) {
     // re-rendered from scratch.
     projectList.replaceChildren();
 
-    inboxButton.classList.toggle("active", selectedProjectIds.length === 0);
+    // The inbox button shows every task, so it is only highlighted when no
+    // projects are picked either.
+    inboxButton.classList.toggle("active", currentView === "inbox" && selectedProjectIds.length === 0);
+    todayButton.classList.toggle("active", currentView === "today");
+    upcomingButton.classList.toggle("active", currentView === "upcoming");
 
     // Render one list item per project.
     manager.projectList.forEach((project) => {
@@ -166,11 +195,20 @@ export default function domController(manager) {
     // from scratch.
     taskList.replaceChildren();
 
+    // Today's date as an ISO string (e.g. "2026-09-25"), the same format
+    // task.dueDate is stored in, so the two can be compared directly.
+    const today = format(new Date(), "yyyy-MM-dd");
+
     // Render one row per task.
     manager.taskList.forEach((task) => {
       // Skip tasks that are not in a picked project. When no projects are
       // picked, every task is shown.
       if (selectedProjectIds.length > 0 && !selectedProjectIds.includes(task.projectId)) return;
+
+      // The Today and Upcoming views only show tasks with a due date, so a
+      // task with none never appears in either.
+      if (currentView === "today" && task.dueDate !== today) return;
+      if (currentView === "upcoming" && task.dueDate <= today) return;
 
       const project = manager.getProjectById(task.projectId);
 
@@ -353,6 +391,19 @@ export default function domController(manager) {
   // Un-pick every project when the inbox is clicked, so all tasks show again.
   inboxButton.addEventListener("click", () => {
     selectedProjectIds = [];
+    currentView = "inbox";
+    renderPage();
+  });
+
+  // Switch to the Today and Upcoming views. The project filter is left as
+  // it is, so it can still narrow down either view.
+  todayButton.addEventListener("click", () => {
+    currentView = "today";
+    renderPage();
+  });
+
+  upcomingButton.addEventListener("click", () => {
+    currentView = "upcoming";
     renderPage();
   });
 
