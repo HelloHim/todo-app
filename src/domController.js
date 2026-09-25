@@ -222,7 +222,7 @@ export default function domController(manager) {
       if (task.completionStatus) checkbox.classList.add("completed");
       // Flips done/not done, then re-renders so the tick mark updates.
       checkbox.addEventListener("click", () => {
-        task.editCompletionStatus(!task.completionStatus);
+        manager.editTaskCompletion(task.taskId, !task.completionStatus);
         renderPage();
       });
 
@@ -440,12 +440,7 @@ export default function domController(manager) {
     const projectId = formData.get("projectId");
 
     if (editingTaskId) {
-      const task = manager.getTaskById(editingTaskId);
-      task.editTitle(title);
-      task.editDescription(description);
-      task.editPriority(priority);
-      task.editDueDate(dueDate);
-      task.editProject(projectId);
+      manager.editTask(editingTaskId, title, description, priority, dueDate, projectId);
     } else {
       // Generate a unique id for this task using the Crypto API, and limit it
       // to 5 characters to keep it short.
@@ -521,9 +516,7 @@ export default function domController(manager) {
     const colour = formData.get("colour");
 
     if (editingProjectId) {
-      const project = manager.getProjectById(editingProjectId);
-      project.editProjectName(projectName);
-      project.editColour(colour);
+      manager.editProject(editingProjectId, projectName, colour);
     } else {
       // Generate a unique id the same way as for tasks.
       const projectId = crypto.randomUUID().substring(0, 5);

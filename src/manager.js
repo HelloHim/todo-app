@@ -29,6 +29,25 @@ export default class Manager {
     const project = new Project(projectId, projectName, colour);
     this.projectList.push(project);
   }
+  // Saves the form's new details to an existing task. Does not touch
+  // completionStatus, which is handled separately by editTaskCompletion.
+  editTask(taskId, title, description, priority, duedate, projectId) {
+    const task = this.getTaskById(taskId);
+    task.editTitle(title);
+    task.editDescription(description);
+    task.editPriority(priority);
+    task.editDueDate(duedate);
+    task.editProject(projectId);
+  }
+  editTaskCompletion(taskId, completionStatus) {
+    const task = this.getTaskById(taskId);
+    task.editCompletionStatus(completionStatus);
+  }
+  editProject(projectId, projectName, colour) {
+    const project = this.getProjectById(projectId);
+    project.editProjectName(projectName);
+    project.editColour(colour);
+  }
   // Removes a project and moves its tasks to the default, invisible project,
   // so no task is left pointing at a project that no longer exists.
   removeProject(projectId) {
