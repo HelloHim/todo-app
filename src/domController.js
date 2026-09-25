@@ -249,7 +249,9 @@ export default function domController(manager) {
       }
 
       const priority = document.createElement("span");
-      priority.classList.add("task-priority");
+      // task.priority is "low", "medium" or "high", which doubles as the
+      // modifier class that colour-codes it in styles.css.
+      priority.classList.add("task-priority", task.priority);
       priority.textContent = task.priority;
       meta.appendChild(priority);
 

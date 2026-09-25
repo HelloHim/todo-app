@@ -287,10 +287,21 @@ button {
 }
 
 .task-priority {
-  color: #825d38;
   font-size: 12px;
   font-weight: 600;
   text-transform: capitalize;
+}
+
+.task-priority.low {
+  color: #4e8a4c;
+}
+
+.task-priority.medium {
+  color: #b8860b;
+}
+
+.task-priority.high {
+  color: #c1442e;
 }
 
 .project-pill {
