@@ -137,9 +137,9 @@ export default function domController(manager) {
     todayButton.classList.toggle("active", currentView === "today");
     upcomingButton.classList.toggle("active", currentView === "upcoming");
 
-    // Render one list item per project. The default project is not a real
-    // project the user made, only a fallback for tasks with none picked, so
-    // it never shows up here.
+    // Render one list item per project. The default project is invisible to
+    // the user, not a real project they made, only a fallback for tasks
+    // with none picked, so it never shows up here.
     manager.projectList.forEach((project) => {
       if (project.projectId === "defaultProjectId") return;
 
@@ -271,7 +271,8 @@ export default function domController(manager) {
       row.appendChild(checkbox);
       row.appendChild(main);
       // A task with no real project shows no pill at all, as the default
-      // project is only a fallback and should never appear in the UI.
+      // project is invisible to the user, only a fallback that should
+      // never appear in the UI.
       if (task.projectId !== "defaultProjectId") {
         const project = manager.getProjectById(task.projectId);
         row.appendChild(createProjectPill(project));
@@ -284,8 +285,8 @@ export default function domController(manager) {
   // Fills the project dropdown with one row per project, plus a "+ New
   // project" row at the bottom. Rebuilt each time the form opens so newly
   // created projects are included. The default project is left out, as it
-  // is not a real project a task can be filed under on purpose, only a
-  // fallback for tasks with no project chosen.
+  // is invisible to the user: not a real project a task can be filed under
+  // on purpose, only a fallback for tasks with no project chosen.
   const renderProjectOptions = function () {
     projectDropdown.replaceChildren();
 
@@ -329,8 +330,8 @@ export default function domController(manager) {
   // Shows "Select Project" with no dot when nothing is chosen yet, and
   // "(none)" with no dot when the default project is chosen, either by
   // picking that row or because the task already had no real project. Both
-  // end up saving the task to the default project, which never shows up in
-  // the UI under its own name.
+  // end up saving the task to the default, invisible project, which never
+  // shows up in the UI under its own name.
   const updateProjectDisplay = function () {
     const hasRealProject = projectInput.value && projectInput.value !== "defaultProjectId";
     projectButton.classList.toggle("unselected", !hasRealProject);
@@ -387,7 +388,8 @@ export default function domController(manager) {
       taskDialogTitle.textContent = "Add Task";
       submitTask.textContent = "Add Task";
       // No project is picked yet. If none is picked before saving,
-      // Manager.createTask falls back to the default project itself.
+      // Manager.createTask falls back to the default, invisible project
+      // itself.
       projectInput.value = "";
     }
 
@@ -497,8 +499,8 @@ export default function domController(manager) {
   newProject.addEventListener("click", () => openProjectDialog());
 
   // Deletes the project being edited. Manager.removeProject already moves
-  // its tasks to the default project, so none of them are left pointing at
-  // a project that no longer exists.
+  // its tasks to the default, invisible project, so none of them are left
+  // pointing at a project that no longer exists.
   deleteProject.addEventListener("click", () => {
     manager.removeProject(editingProjectId);
     projectDialog.close();
