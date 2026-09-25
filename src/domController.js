@@ -63,7 +63,10 @@ export default function domController(manager) {
   const taskForm = document.getElementById("task-form");
   const taskDialogTitle = document.getElementById("task-dialog-title");
   const submitTask = document.getElementById("submit-task");
-  const projectSelect = document.getElementById("task-project-input");
+  const projectButton = document.getElementById("task-project-button");
+  const projectLabel = document.getElementById("task-project-label");
+  const projectInput = document.getElementById("task-project-input");
+  const projectDropdown = document.getElementById("task-project-list");
   const projectDot = document.getElementById("task-project-dot");
   // The row above the task list showing which projects are picked.
   const filterPills = document.getElementById("filter-pills");
@@ -235,36 +238,88 @@ export default function domController(manager) {
     });
   };
 
-  // Fills the project dropdown with one option per project. It is rebuilt
-  // each time the form opens so newly created projects are included.
+  // Fills the project dropdown with one row per project, plus a "+ New
+  // project" row at the bottom. Rebuilt each time the form opens so newly
+  // created projects are included. The default project is left out, as it
+  // is not a real project a task can be filed under on purpose, only a
+  // fallback for tasks with no project chosen.
   const renderProjectOptions = function () {
-    projectSelect.replaceChildren();
+    projectDropdown.replaceChildren();
+
     manager.projectList.forEach((project) => {
-      const option = document.createElement("option");
-      option.value = project.projectId;
-      // Tasks without a project live in the default project, which the
-      // design calls "Inbox".
-      option.textContent = project.projectId === "defaultProjectId" ? "Inbox" : project.projectName;
-      projectSelect.appendChild(option);
+      if (project.projectId === "defaultProjectId") return;
+
+      const row = document.createElement("div");
+      row.classList.add("project-dropdown-item");
+
+      const dot = document.createElement("span");
+      dot.classList.add("project-dot");
+      dot.style.backgroundColor = project.colour;
+      row.appendChild(dot);
+
+      const label = document.createElement("span");
+      label.textContent = project.projectName;
+      row.appendChild(label);
+
+      row.addEventListener("click", () => selectProject(project.projectId));
+      projectDropdown.appendChild(row);
     });
+
+    const newProjectRow = document.createElement("div");
+    newProjectRow.classList.add("project-dropdown-item", "new-project");
+    newProjectRow.textContent = "+ New project";
+    newProjectRow.addEventListener("click", () => {
+      projectDropdown.classList.remove("open");
+      openProjectDialog();
+    });
+    projectDropdown.appendChild(newProjectRow);
   };
 
-  // Shows a hollow dot beside the project select when the inbox is chosen,
-  // and one filled with the project's colour for a real project, as a native
-  // select cannot show icons inside itself.
-  const updateProjectDot = function () {
-    const isInbox = projectSelect.value === "defaultProjectId";
+  // Shows "Select Project" with no dot when nothing is chosen yet. A task
+  // can still end up with no project chosen, as Manager.createTask falls
+  // back to the default project when it gets an empty projectId. An older
+  // task already filed under the default project shows a hollow dot and
+  // "Inbox", even though it cannot be picked again from the dropdown.
+  const updateProjectDisplay = function () {
+    projectButton.classList.toggle("unselected", !projectInput.value);
+    if (!projectInput.value) {
+      projectLabel.textContent = "Select Project";
+      return;
+    }
+
+    const isInbox = projectInput.value === "defaultProjectId";
     projectDot.classList.toggle("inbox", isInbox);
 
     if (isInbox) {
       // Clear the colour so the hollow inbox style from the CSS shows.
       projectDot.style.backgroundColor = "";
+      projectLabel.textContent = "Inbox";
     } else {
-      const project = manager.getProjectById(projectSelect.value);
+      const project = manager.getProjectById(projectInput.value);
       projectDot.style.backgroundColor = project.colour;
+      projectLabel.textContent = project.projectName;
     }
   };
-  projectSelect.addEventListener("change", updateProjectDot);
+
+  // Picks a project from the dropdown: stores its id in the hidden input the
+  // form submits, updates the button to show it, then closes the dropdown.
+  const selectProject = function (projectId) {
+    projectInput.value = projectId;
+    updateProjectDisplay();
+    projectDropdown.classList.remove("open");
+  };
+
+  // Opens and closes the dropdown when its button is clicked.
+  projectButton.addEventListener("click", () => {
+    projectDropdown.classList.toggle("open");
+  });
+
+  // Closes the dropdown when clicking anywhere else on the page.
+  document.addEventListener("click", (event) => {
+    if (!projectButton.contains(event.target) && !projectDropdown.contains(event.target)) {
+      projectDropdown.classList.remove("open");
+    }
+  });
 
   // Opens the task form as a modal. Given a task, the form is filled with its
   // details and saving updates it. Without one, the form starts empty and
@@ -281,14 +336,17 @@ export default function domController(manager) {
       taskForm.elements.description.value = task.description;
       taskForm.elements.dueDate.value = task.dueDate;
       taskForm.elements.priority.value = task.priority;
-      taskForm.elements.projectId.value = task.projectId;
+      projectInput.value = task.projectId;
     } else {
       editingTaskId = null;
       taskDialogTitle.textContent = "Add Task";
       submitTask.textContent = "Add Task";
+      // No project is picked yet. If none is picked before saving,
+      // Manager.createTask falls back to the default project itself.
+      projectInput.value = "";
     }
 
-    updateProjectDot();
+    updateProjectDisplay();
     taskDialog.showModal();
   };
 
@@ -395,6 +453,14 @@ export default function domController(manager) {
       // Generate a unique id the same way as for tasks.
       const projectId = crypto.randomUUID().substring(0, 5);
       manager.createProject(projectId, projectName, colour);
+
+      // The "+ New project" row in the task dialog opens this same form, so
+      // if the task dialog is still open behind it, pick the project just
+      // created rather than leaving the old one selected.
+      if (taskDialog.open) {
+        renderProjectOptions();
+        selectProject(projectId);
+      }
     }
 
     projectDialog.close();

@@ -186,10 +186,14 @@
             </select>
           </div>
           <div class="form-field">
-            <label for="task-project-input">Project</label>
+            <label for="task-project-button">Project</label>
             <div class="project-select">
-              <span id="task-project-dot" class="project-dot"></span>
-              <select id="task-project-input" name="projectId"></select>
+              <button type="button" id="task-project-button" class="project-select-button">
+                <span id="task-project-dot" class="project-dot"></span>
+                <span id="task-project-label">Select Project</span>
+              </button>
+              <input type="hidden" id="task-project-input" name="projectId" />
+              <div id="task-project-list" class="project-dropdown"></div>
             </div>
           </div>
         </div>

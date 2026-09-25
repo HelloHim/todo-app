@@ -441,6 +441,7 @@ button {
 #task-form input,
 #task-form textarea,
 #task-form select,
+#task-form .project-select-button,
 #project-form input {
   height: 34px;
   border: 1px solid #e3e0dc;
@@ -461,6 +462,7 @@ button {
 #task-form input:focus,
 #task-form textarea:focus,
 #task-form select:focus,
+#task-form .project-select-button:focus,
 #project-form input:focus {
   outline: none;
   border-color: #bdb7b1;
@@ -484,7 +486,8 @@ button {
 }
 
 /* Replace the browser's select arrow with a chevron that matches the icons. */
-#task-form select {
+#task-form select,
+#task-form .project-select-button {
   appearance: none;
   padding-right: 36px;
   color: #6b6561;
@@ -516,9 +519,82 @@ button {
 
 /* Leaves room on the left for the project dot. The #task-form prefix is
    needed to outweigh the shared input padding above. */
-#task-form .project-select > select {
+#task-form .project-select > .project-select-button {
+  display: flex;
+  align-items: center;
   width: 100%;
   padding-left: 27px;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Before a project is picked there is no dot to make room for, so the
+   button's padding matches the other fields in the row. */
+#task-form .project-select > .project-select-button.unselected {
+  padding-left: 12px;
+}
+
+.project-select-button.unselected > .project-dot {
+  display: none;
+}
+
+/* The list of projects shown below the button when it is clicked. Hidden
+   until the "open" class is added by domController.js. */
+.project-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: max-content;
+  min-width: 100%;
+  border: 1px solid #e3e0dc;
+  border-radius: 8px;
+  padding: 6px;
+  background-color: #ffffff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  z-index: 1;
+}
+
+.project-dropdown.open {
+  display: block;
+}
+
+.project-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  color: #34302c;
+  font-size: 13px;
+  cursor: pointer;
+
+  /* Dots are square in the sidebar list but round wherever a project is
+     being picked, matching the button's own dot above. */
+  & > .project-dot {
+    border-radius: 50%;
+  }
+
+  & > .project-dot.inbox {
+    background-color: transparent;
+    border: 1.5px solid #8f8a85;
+  }
+}
+
+.project-dropdown-item:hover {
+  background-color: #f1efee;
+}
+
+/* The last row, which opens the add project form instead of picking a
+   project. Uses the same red as the sidebar's "Add task" button. */
+.project-dropdown-item.new-project {
+  color: #b75334;
+  font-weight: 500;
+}
+
+.project-dropdown-item.new-project:hover {
+  background-color: #fdf1ee;
 }
 
 /* A small swatch rather than a full-width bar. */
