@@ -177,6 +177,11 @@ export default function domController(manager) {
       const checkbox = document.createElement("button");
       checkbox.classList.add("task-checkbox");
       if (task.completionStatus) checkbox.classList.add("completed");
+      // Flips done/not done, then re-renders so the tick mark updates.
+      checkbox.addEventListener("click", () => {
+        task.editCompletionStatus(!task.completionStatus);
+        renderPage();
+      });
 
       // Groups the title with its date and priority line. The row's CSS grid
       // lays these children out directly (display: contents), so the wrapper
