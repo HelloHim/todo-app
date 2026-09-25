@@ -8,10 +8,17 @@ import { saveToLocalStorage, loadFromLocalStorage } from "./storage.js";
 export default class Manager {
   constructor() {
     const loadedTodoData = loadFromLocalStorage();
-    
+
     if (loadedTodoData) {
-      this.taskList = loadedTodoData.taskList;
-      this.projectList = loadedTodoData.projectList;
+      // JSON.parse only gives back plain objects, not real Task and Project
+      // instances, so they would be missing methods like editTitle(). Build
+      // a proper instance for each one from its saved fields.
+      this.taskList = loadedTodoData.taskList.map((task) => {
+        return new Task(task.taskId, task.title, task.description, task.completionStatus, task.priority, task.dueDate, task.projectId);
+      });
+      this.projectList = loadedTodoData.projectList.map((project) => {
+        return new Project(project.projectId, project.projectName, project.colour);
+      });
     } else {
       this.taskList = [];
       this.projectList = [];
